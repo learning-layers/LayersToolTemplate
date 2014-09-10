@@ -37,21 +37,32 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#"><img src="extras/logo48.png" width="24" height="24" alt="Learning Layers"/> Example Layers tool</a>
+            <a class="navbar-brand" href="#"> Example Layers tool</a>
           </div>
           <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
               <li><a href="elements.html">UI elements</a></li>
               <li><a href="grid.html">Grid system</a></li>
             </ul>
-            <ul class="nav navbar-nav navbar-right">
-              <li><a href="#">Login</a></li>
-            </ul>
-            <form class="navbar-form navbar-right" role="search">
+              <!-- 
+              OpenID Connect Button - Step 3: add HTML element representing button 
+              see https://github.com/learning-layers/openid-connect-button 
+              -->              
+              <span class="oidc-signin navbar-btn navbar-right btn-default"
+                  data-callback="signinCallback"
+                  data-name="Learning Layers"
+                  data-size="sm"
+                  data-nofill="1"
+                  data-logo="extras/logo48.png"
+                  data-server="http://api.learning-layers.eu/o/oauth2"
+                  data-clientid="CLIENTID_HERE"
+                  data-scope="openid phone email address profile">
+              </span>
+            <form class="navbar-form navbar-right" role="search" style="margin-right:0px">
               <div class="form-group">
                 <input type="text" class="form-control" placeholder="Search">
+                <button type="submit" class="btn btn-default btn-sm">Submit</button>
               </div>
-              <button type="submit" class="btn btn-default btn-sm">Submit</button>
             </form>
           </div><!--/.nav-collapse -->
         </div>
@@ -131,11 +142,62 @@
     <script src="js/jquery.ui.touch-punch.min.js"></script>
     <!-- <script src="js/jquery-ui-1.10.4.custom.min.js"></script> -->
     <script src="js/bootstrap.min.js"></script>
+    <!-- import JWS and JSRSASIGN (must for OIDC connect button) -->
+    <script type="text/javascript" src="./js/jsjws/jws-2.0.js"></script>
+    <script type="text/javascript" src="./js/jsrsasign/ext/base64.js"></script>
+    <script type="text/javascript" src="./js/jsrsasign/base64x-1.1.js"></script>
+    <script type="text/javascript" src="./js/jsrsasign/ext/jsbn.js"></script>
+    <script type="text/javascript" src="./js/jsrsasign/ext/jsbn2.js"></script>
+    <script type="text/javascript" src="./js/jsrsasign/asn1hex-1.1.js"></script>
+    <script type="text/javascript" src="./js/jsrsasign/crypto-1.1.js"></script>
+    <script type="text/javascript" src="./js/jsrsasign/ext/rsa.js"></script>
+    <script type="text/javascript" src="./js/jsrsasign/ext/rsa2.js"></script>
+    <script type="text/javascript" src="./js/jsrsasign/rsapem-1.1.js"></script>
+    <script type="text/javascript" src="./js/jsrsasign/rsasign-1.2.min.js"></script>
+    <script type="text/javascript" src="./js/jsrsasign/x509-1.1.js"></script>
+    <script type="text/javascript" src="./js/jsrsasign/crypto-1.1.js"></script>
+
+
     <script>
       $(function() {
         $(".ui-draggable").draggable({ revert: "invalid" });
         $(".ui-droppable").droppable();
       });
+
+      // OpenID Connect Button - Step 2: add this script element right before closing </body> tag 
+      // see https://github.com/learning-layers/openid-connect-button 
+      (function() {
+        var po = document.createElement('script'); 
+        po.type = 'text/javascript'; 
+        po.async = true;
+        po.src = './js/oidc-button.js';
+        var s = document.getElementsByTagName('script')[0]; 
+        s.parentNode.insertBefore(po, s);
+      })();
+
+      // OpenID Connect Button - Step 4: implement a callback function
+      // see https://github.com/learning-layers/openid-connect-button 
+      function signinCallback(result) {
+        if(result === "success"){
+          // at this point, developers have access to several pieces of information
+          // relevant to OpenID Connect (see ./oidc-button.js)
+          console.log("OpenID Connect Provider Configuration:");
+          console.log(oidc_provider_config);
+          console.log("OpenID Connect User Info:");
+          console.log(oidc_userinfo);
+          console.log("OpenID Connect ID Token:");
+          console.log(oidc_idtoken);
+          
+          $("#status").html("Hello, " + oidc_userinfo.name + "!");
+        } else {
+          console.log("not signed in...");
+          console.log(result);
+          $("#status").html("Do I know you?!");
+        }
+      }
+
+      // Note: OpenID Connect Button - Step 1 is about registering app to OIDC. Login button doesn't work all the way before it.  
+
     </script>
   </body>
   </html>
